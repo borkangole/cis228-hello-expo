@@ -1,98 +1,281 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { useState, useEffect, useRef } from "react";
+import {
+  Alert,
+  Animated,
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const [name, setName] = useState("");
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  // Animation values
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(-30)).current;
+  const scaleAnim = useRef(new Animated.Value(0.8)).current;
+  const buttonScale = useRef(new Animated.Value(1)).current;
+  const previewOpacity = useRef(new Animated.Value(0)).current;
+  const logoSpin = useRef(new Animated.Value(0)).current;
+
+  // Entry animations on mount
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 6,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 5,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Logo slow spin loop
+    Animated.loop(
+      Animated.timing(logoSpin, {
+        toValue: 1,
+        duration: 8000,
+        useNativeDriver: true,
+      })
+    ).start();
+  }, []);
+
+  // Show preview with fade when name changes
+  useEffect(() => {
+    if (name.trim()) {
+      Animated.timing(previewOpacity, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(previewOpacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [name]);
+
+  const spin = logoSpin.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "360deg"],
+  });
+
+  const onPressIn = () => {
+    Animated.spring(buttonScale, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const onPressOut = () => {
+    Animated.spring(buttonScale, {
+      toValue: 1,
+      friction: 3,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const onPressHello = () => {
+    const trimmed = name.trim();
+    Alert.alert(
+      "👋 Hello!",
+      trimmed
+        ? `Hello, ${trimmed}! Welcome to CIS 228!`
+        : "Please type your name first!"
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+
+      {/* Header - slides in from top */}
+      <Animated.View
+        style={[
+          styles.header,
+          { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
+        ]}
+      >
+        <Text style={styles.emoji}>🚀</Text>
+        <Text style={styles.title}>Hello Expo!</Text>
+        <Text style={styles.subtitle}>My First React Native App</Text>
+      </Animated.View>
+
+      {/* Logo card - scales in */}
+      <Animated.View
+        style={[
+          styles.card,
+          { opacity: fadeAnim, transform: [{ scale: scaleAnim }] },
+        ]}
+      >
+        <Animated.Image
+          style={[styles.logo, { transform: [{ rotate: spin }] }]}
+          source={{ uri: "https://reactnative.dev/img/tiny_logo.png" }}
+        />
+        <Text style={styles.cardLabel}>Powered by React Native</Text>
+      </Animated.View>
+
+      {/* Input section - fades in */}
+      <Animated.View
+        style={[styles.inputSection, { opacity: fadeAnim }]}
+      >
+        <Text style={styles.label}>👤 Enter your name:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="e.g. Mhel"
+          placeholderTextColor="#94a3b8"
+          value={name}
+          onChangeText={setName}
+          autoCapitalize="words"
+        />
+      </Animated.View>
+
+      {/* Button - press animation */}
+      <Animated.View
+        style={[
+          styles.buttonWrap,
+          { transform: [{ scale: buttonScale }], opacity: fadeAnim },
+        ]}
+      >
+        <TouchableOpacity
+          style={styles.button}
+          onPress={onPressHello}
+          onPressIn={onPressIn}
+          onPressOut={onPressOut}
+          activeOpacity={1}
+        >
+          <Text style={styles.buttonText}>👋 Say Hello</Text>
+        </TouchableOpacity>
+      </Animated.View>
+
+      {/* Preview - fades in when name is typed */}
+      <Animated.View
+        style={[styles.previewBox, { opacity: previewOpacity }]}
+      >
+        <Text style={styles.previewText}>Hello, {name.trim()}! 🎉</Text>
+      </Animated.View>
+
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  container: {
+    flex: 1,
+    backgroundColor: "#0f172a",
+    padding: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 20,
+  },
+  header: {
+    alignItems: "center",
+    gap: 4,
+  },
+  emoji: {
+    fontSize: 48,
+  },
+  title: {
+    fontSize: 38,
+    fontWeight: "900",
+    color: "#f1f5f9",
+    letterSpacing: 1,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "#64748b",
+    letterSpacing: 2,
+    textTransform: "uppercase",
+  },
+  card: {
+    backgroundColor: "#1e293b",
+    borderRadius: 24,
+    padding: 24,
+    alignItems: "center",
+    gap: 10,
+    width: "100%",
+    shadowColor: "#6366f1",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+  },
+  cardLabel: {
+    color: "#94a3b8",
+    fontSize: 13,
+    letterSpacing: 1,
+  },
+  inputSection: {
+    width: "100%",
     gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  label: {
+    color: "#e2e8f0",
+    fontSize: 15,
+    fontWeight: "600",
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  input: {
+    width: "100%",
+    backgroundColor: "#1e293b",
+    borderWidth: 1,
+    borderColor: "#334155",
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: "white",
+  },
+  buttonWrap: {
+    width: "100%",
+  },
+  button: {
+    backgroundColor: "#6366f1",
+    borderRadius: 14,
+    paddingVertical: 16,
+    alignItems: "center",
+    shadowColor: "#6366f1",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+  },
+  previewBox: {
+    backgroundColor: "#1e293b",
+    borderRadius: 14,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderLeftWidth: 4,
+    borderLeftColor: "#6366f1",
+    width: "100%",
+  },
+  previewText: {
+    color: "#a5b4fc",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

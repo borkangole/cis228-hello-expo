@@ -1,50 +1,37 @@
-# Welcome to your Expo app 👋
+# cis228-hello-expo 🚀
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A simple interactive mobile app built with **React Native** and **Expo** for CIS 228.
 
-## Get started
+## 📱 What it does
+- Displays a personalized greeting screen
+- Shows an animated spinning React Native logo
+- Lets the user type their name
+- Shows a live preview and an Alert popup saying hello
 
-1. Install dependencies
+## 🛠️ How to install and run
 
-   ```bash
-   npm install
-   ```
+### Prerequisites
+- [Node.js](https://nodejs.org/) installed
+- [Expo Go](https://expo.dev/client) app on your phone
 
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+### Steps
 ```bash
-npm run reset-project
+# 1. Clone the repository
+git clone https://github.com/borkangole/cis228-hello-expo.git
+
+# 2. Go into the project folder
+cd cis228-hello-expo
+
+# 3. Install dependencies
+npm install
+
+# 4. Start the app
+npm start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Then scan the QR code with your iPhone Camera or Expo Go app.
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## 🧰 Built With
+- [React Native](https://reactnative.dev/)
+- [Expo](https://expo.dev/)
+- TypeScript
